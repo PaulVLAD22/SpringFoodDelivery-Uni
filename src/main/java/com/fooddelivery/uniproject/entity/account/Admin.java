@@ -13,15 +13,7 @@ import javax.persistence.Table;
 @AllArgsConstructor
 @SuperBuilder
 @Entity
-@Table(name = "users")
-public class User extends Account {
-// add coordinate
-    public User(long id, String username, String email, String password) {
-        super(id, username, email, password);
-    }
+@Table(name = "admins")
+public class Admin extends Account {
 
-    @Override
-    public String toString() {
-        return "User id: " + this.getId() + " " + super.toString();
-    }
 }
