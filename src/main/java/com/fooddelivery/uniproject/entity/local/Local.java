@@ -14,11 +14,11 @@ import javax.persistence.*;
 @Table(name="locals")
 public class Local {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     private String name;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.REMOVE)
     private Menu menu;
     @OneToOne
     private Location location;

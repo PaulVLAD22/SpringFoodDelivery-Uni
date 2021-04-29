@@ -16,7 +16,7 @@ import java.util.Objects;
 @MappedSuperclass
 public abstract class Account {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected long id;
     protected String username;
     protected String email;

@@ -22,11 +22,11 @@ import java.util.Map;
 @Table(name="orders")
 public class Order {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @OneToOne
+    @ManyToOne
     private User user;
-    @OneToOne
+    @ManyToOne
     private Driver driver;
     @ManyToOne
     private Local local;

@@ -13,10 +13,10 @@ import javax.persistence.*;
 @Table(name="locations")
 public class Location {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.REMOVE)
     private Address address;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.REMOVE)
     private Coordinate coordinate;
 }

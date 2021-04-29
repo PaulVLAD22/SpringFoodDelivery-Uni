@@ -28,29 +28,30 @@ public class Company {
     private List<Admin> admins = new ArrayList<>();
     private List<Order> orders = new ArrayList<>();
 
-    //singleton
-    private Company(){
+    // Singleton
+    private Company() {
     }
+
     public static Company getInstance() {
-        if (instance==null){
-            instance=new Company();
+        if (instance == null) {
+            instance = new Company();
         }
         return instance;
     }
 
     public void setCostumers(List<Account> costumers) {
         this.costumers = costumers;
-        for (Account account : costumers){
-            if (account instanceof User){
-                this.getUsers().add((User)account);
-            }
-            else{
-                this.getDrivers().add((Driver)account);
+        for (Account account : costumers) {
+            if (account instanceof User) {
+                this.getUsers().add((User) account);
+            } else {
+                this.getDrivers().add((Driver) account);
             }
         }
     }
-    // set orders seteaza la useri comenzile
-    public void setOrders(List<Order> orders){
+
+    // Set orders seteaza la useri comenzile
+    public void setOrders(List<Order> orders) {
         orders.stream().forEach(order -> {
             order.getDriver().setCurrentOrder(order);
         });

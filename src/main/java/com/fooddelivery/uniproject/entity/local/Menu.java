@@ -11,10 +11,10 @@ import java.util.Set;
 @Table (name="menu")
 public class Menu {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @ManyToMany(mappedBy = "menu")
+    @ManyToMany(mappedBy = "menu",cascade = CascadeType.REMOVE)
     private List<Product> products;
 
 }
