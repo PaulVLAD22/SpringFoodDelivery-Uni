@@ -1,18 +1,16 @@
 package com.fooddelivery.uniproject.entity.order;
 
+
 import com.fooddelivery.uniproject.entity.account.Driver;
 import com.fooddelivery.uniproject.entity.account.User;
 import com.fooddelivery.uniproject.entity.local.Local;
 import com.fooddelivery.uniproject.entity.local.Product;
-import com.fooddelivery.uniproject.entity.location.Coordinate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import java.util.List;
 import java.util.Map;
 
 @Data
@@ -20,20 +18,20 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name="orders")
-public class Order {
+@Table(name="order_items")
+public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    @ManyToOne
+    private Order order;
 
-    private OrderStatus status;
+    @ManyToOne
+    private Product product;
 
-    @ManyToOne
-    private User user;
-    @ManyToOne
-    private Driver driver;
-    @ManyToOne
-    private Local local;
-    @OneToMany
-    private List<OrderItem> orderItems;
+    private long quantity;
+
 }
+
+
+

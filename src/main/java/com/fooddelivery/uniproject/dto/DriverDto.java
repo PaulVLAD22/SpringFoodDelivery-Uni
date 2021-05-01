@@ -1,5 +1,6 @@
-package com.fooddelivery.uniproject.dtos;
+package com.fooddelivery.uniproject.dto;
 
+import com.fooddelivery.uniproject.entity.location.Coordinate;
 import com.fooddelivery.uniproject.entity.order.Order;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class DriverDto {
 
-    private String name;
+    private String username;
 
     private String email;
 
@@ -20,7 +21,5 @@ public class DriverDto {
 
     private double salary;
 
-    private int coordinateX;
-
-    private int coordinateY;
+    private Coordinate coordinate;
 }

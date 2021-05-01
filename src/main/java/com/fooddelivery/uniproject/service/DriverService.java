@@ -1,9 +1,8 @@
 package com.fooddelivery.uniproject.service;
 
-import com.fooddelivery.uniproject.dtos.RegisterDto;
+import com.fooddelivery.uniproject.dto.DriverDto;
+import com.fooddelivery.uniproject.dto.RegisterAccountDto;
 import com.fooddelivery.uniproject.entity.account.Driver;
-import com.fooddelivery.uniproject.entity.account.User;
-import com.fooddelivery.uniproject.entity.location.Coordinate;
 import com.fooddelivery.uniproject.exception.UsernameOrEmailAlreadyTaken;
 import com.fooddelivery.uniproject.repository.CoordinateRepository;
 import com.fooddelivery.uniproject.repository.DriverRepository;
@@ -13,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class DriverService {
@@ -26,22 +27,36 @@ public class DriverService {
         this.coordinateRepository= coordinateRepository;
     }
 
+    public List<DriverDto> listAll() {
+        List<Driver> drivers = driverRepository.findAll();
+        List<DriverDto> driverDtos = new ArrayList<>();
+
+        drivers.forEach(driver->driverDtos.add(
+                DriverDto.builder()
+                        .username(driver.getUsername())
+                        .email(driver.getEmail())
+                        .salary(driver.getSalary())
+                        .currentOrder(driver.getCurrentOrder())
+                        .coordinate(driver.getCoordinate())
+                        .build())
+        );
+        return driverDtos;
+    }
+
+
     @SneakyThrows
-    public void registerDriver(RegisterDto registerDto) {
-        if (driverRepository.findUserByEmail(registerDto.getEmail()).isPresent()) {
+    public void registerDriver(RegisterAccountDto registerAccountDto) {
+        if (driverRepository.findUserByEmail(registerAccountDto.getEmail()).isPresent()) {
             throw new UsernameOrEmailAlreadyTaken();
         }
-        Coordinate coordinate = Coordinate.builder()
-                .x(registerDto.getCoordinateX())
-                .y(registerDto.getCoordinateY()).build();
 
-        coordinateRepository.save(coordinate);
+        coordinateRepository.save(registerAccountDto.getCoordinate());
 
         Driver driver = Driver.builder()
-                .email(registerDto.getEmail())
-                .password(registerDto.getPassword())
-                .username(registerDto.getUserName())
-                .coordinate(coordinate).build();
+                .email(registerAccountDto.getEmail())
+                .password(registerAccountDto.getPassword())
+                .username(registerAccountDto.getUsername())
+                .coordinate(registerAccountDto.getCoordinate()).build();
 
         driverRepository.save(driver);
     }

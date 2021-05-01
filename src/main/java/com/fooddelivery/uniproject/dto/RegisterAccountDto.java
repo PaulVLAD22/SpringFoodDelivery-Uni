@@ -1,5 +1,6 @@
-package com.fooddelivery.uniproject.dtos;
+package com.fooddelivery.uniproject.dto;
 
+import com.fooddelivery.uniproject.entity.location.Coordinate;
 import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,17 +11,15 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterDto {
+public class RegisterAccountDto {
 
     @NotNull
     private String email;
 
-    private String userName;
+    private String username;
 
     private String password;
 
-    private int coordinateX;
-
-    private int coordinateY;
+    private Coordinate coordinate;
 
 }

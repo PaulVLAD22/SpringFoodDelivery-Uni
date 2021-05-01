@@ -20,7 +20,7 @@ import javax.persistence.Table;
 @NoArgsConstructor
 @SuperBuilder
 @Entity
-@Table(name="driver")
+@Table(name="drivers")
 public class Driver extends Account {
     @OneToOne
     private Order currentOrder;

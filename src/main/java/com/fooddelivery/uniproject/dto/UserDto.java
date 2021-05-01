@@ -1,5 +1,6 @@
-package com.fooddelivery.uniproject.dtos;
+package com.fooddelivery.uniproject.dto;
 
+import com.fooddelivery.uniproject.entity.location.Coordinate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,11 +12,10 @@ import lombok.NoArgsConstructor;
 @Data
 public class UserDto {
 
-   private String name;
+   private String username;
 
    private String email;
 
-   private int coordinateX;
+   private Coordinate coordinate;
 
-   private int coordinateY;
 }
