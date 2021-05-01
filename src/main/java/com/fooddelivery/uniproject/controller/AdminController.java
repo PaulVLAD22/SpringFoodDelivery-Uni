@@ -34,7 +34,6 @@ public class AdminController {
     }
 
 
-
     @DeleteMapping("driver/delete/")
     @SneakyThrows
     public ResponseEntity<SuccessDto> deleteDriver(@RequestParam Long driverId) {
@@ -43,7 +42,7 @@ public class AdminController {
     }
 
     @GetMapping("driver/id={id}")
-    public ResponseEntity<DriverDto> getDriver(@PathVariable Long id){
+    public ResponseEntity<DriverDto> getDriver(@PathVariable Long id) {
         try {
             Driver driver = driverService.get(id);
 
@@ -55,14 +54,14 @@ public class AdminController {
                     .coordinate(driver.getCoordinate()).build();
 
             return new ResponseEntity<DriverDto>(driverDto, HttpStatus.OK);
-        }catch(NoSuchElementException e){
+        } catch (NoSuchElementException e) {
             return new ResponseEntity<DriverDto>(HttpStatus.NOT_FOUND);
         }
     }
 
 
     @GetMapping("/drivers")
-    public List<DriverDto> getDrivers(){
+    public List<DriverDto> getDrivers() {
         return driverService.listAll();
     }
 
@@ -75,7 +74,7 @@ public class AdminController {
     }
 
     @GetMapping("user/id={id}")
-    public ResponseEntity<UserDto> getUser(@PathVariable Long id){
+    public ResponseEntity<UserDto> getUser(@PathVariable Long id) {
         try {
             User user = userService.get(id);
 
@@ -85,16 +84,15 @@ public class AdminController {
                     .coordinate(user.getCoordinate()).build();
 
             return new ResponseEntity<UserDto>(userDto, HttpStatus.OK);
-        }catch(NoSuchElementException e){
+        } catch (NoSuchElementException e) {
             return new ResponseEntity<UserDto>(HttpStatus.NOT_FOUND);
         }
     }
 
     @GetMapping("/users")
-    public List<UserDto> getUsers(){
+    public List<UserDto> getUsers() {
         return userService.listAll();
     }
-
 
 
     @PostMapping("/local/register")
@@ -104,10 +102,21 @@ public class AdminController {
 
         return new ResponseEntity<>(new SuccessDto(), HttpStatus.OK);
     }
+
     @PostMapping("local/id={id}/addProduct")
+    @SneakyThrows
+    public ResponseEntity<Local> getLocal(@PathVariable Long id) {
+        try {
+            Local local = localService.get(id);
+            return new ResponseEntity<Local>(local, HttpStatus.OK);
+
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<Local>(HttpStatus.NOT_FOUND);
+        }
+    }
 
     @GetMapping("locals")
-    public List<Local> getLocals(){
+    public List<Local> getLocals() {
         return localService.listAll();
     }
 }

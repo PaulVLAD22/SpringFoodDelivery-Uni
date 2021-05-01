@@ -1,6 +1,7 @@
 package com.fooddelivery.uniproject.service;
 
 import com.fooddelivery.uniproject.dto.RegisterLocalDto;
+import com.fooddelivery.uniproject.entity.account.User;
 import com.fooddelivery.uniproject.entity.local.Local;
 import com.fooddelivery.uniproject.exception.LocalNameAlreadyTakenException;
 import com.fooddelivery.uniproject.repository.LocalRepository;
@@ -41,6 +42,11 @@ public class LocalService {
 
         localRepository.save(local);
     }
+
+    public Local get(Long id) {
+        return localRepository.findById(id).get();
+    }
+
 
 
 
