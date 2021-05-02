@@ -7,9 +7,11 @@ import com.fooddelivery.uniproject.entity.account.Driver;
 import com.fooddelivery.uniproject.entity.account.User;
 import com.fooddelivery.uniproject.entity.local.Local;
 import com.fooddelivery.uniproject.entity.local.Product;
+import com.fooddelivery.uniproject.entity.order.Order;
 import com.fooddelivery.uniproject.exception.NonExistentId;
 import com.fooddelivery.uniproject.service.DriverService;
 import com.fooddelivery.uniproject.service.LocalService;
+import com.fooddelivery.uniproject.service.OrderService;
 import com.fooddelivery.uniproject.service.UserService;
 import com.fooddelivery.uniproject.utils.SuccessDto;
 import lombok.SneakyThrows;
@@ -27,12 +29,15 @@ public class AdminController {
     private DriverService driverService;
     private UserService userService;
     private LocalService localService;
+    private OrderService orderService;
 
     @Autowired
-    public AdminController(DriverService driverService, UserService userService, LocalService localService) {
+    public AdminController(DriverService driverService, UserService userService, LocalService localService,
+                           OrderService orderService) {
         this.driverService = driverService;
         this.userService = userService;
         this.localService = localService;
+        this.orderService = orderService;
     }
 
 
@@ -124,6 +129,8 @@ public class AdminController {
     @ResponseBody
     public ResponseEntity<Local> getLocal(@PathVariable Long id, @RequestBody Product product) {
         try {
+//            {"name":"nume",
+//                    "price":50}
             localService.addProduct(id,product);
             return new ResponseEntity<Local>(HttpStatus.OK);
 
@@ -135,5 +142,10 @@ public class AdminController {
     @GetMapping("locals")
     public List<Local> getLocals() {
         return localService.listAll();
+    }
+
+    @GetMapping("orders")
+    public List<Order> getOrders(){
+        return orderService.listAll();
     }
 }

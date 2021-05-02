@@ -1,10 +1,13 @@
 package com.fooddelivery.uniproject.entity.local;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -20,8 +23,9 @@ public class Product {
     private String name;
     private double price;
 
-    @ManyToMany
-    private List<Menu> menu;
+    @JsonIgnore
+    @ManyToMany(mappedBy = "products", fetch = FetchType.LAZY)
+    private Set<Menu> menu = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {

@@ -98,6 +98,15 @@ public class UserService {
         if (optionalChosenLocal.isEmpty()) {
             throw new NonExistentId();
         }
+
+        // menu = local.getMenu
+        // for orderItem in orderItems:
+        // select product from products where products.menu = :menu
+
+        // apoi cream order cu orderItems pe care o creeam pe parcurs folosind orderItem.quantity
+
+
+
         Local chosenLocal = optionalChosenLocal.get();
         Driver driver = closestDriver(chosenLocal);
         Order order = Order.builder()

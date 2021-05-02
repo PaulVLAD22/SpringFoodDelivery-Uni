@@ -8,10 +8,7 @@ import com.fooddelivery.uniproject.entity.local.Menu;
 import com.fooddelivery.uniproject.entity.local.Product;
 import com.fooddelivery.uniproject.exception.LocalNameAlreadyTakenException;
 import com.fooddelivery.uniproject.exception.NonExistentId;
-import com.fooddelivery.uniproject.repository.ActionRepository;
-import com.fooddelivery.uniproject.repository.LocalRepository;
-import com.fooddelivery.uniproject.repository.LocationRepository;
-import com.fooddelivery.uniproject.repository.MenuRepository;
+import com.fooddelivery.uniproject.repository.*;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,11 +20,13 @@ import java.util.List;
 public class LocalService {
     private LocalRepository localRepository;
     private ActionRepository actionRepository;
+    private ProductRepository productRepository;
 
     @Autowired
-    public LocalService(LocalRepository localRepository,ActionRepository actionRepository) {
+    public LocalService(LocalRepository localRepository,ActionRepository actionRepository, ProductRepository productRepository) {
         this.localRepository = localRepository;
         this.actionRepository = actionRepository;
+        this.productRepository = productRepository;
     }
 
     public List<Local> listAll() {
@@ -59,14 +58,11 @@ public class LocalService {
     }
 
     public void addProduct(Long id,Product product){
-        //insert into products
-        // insert into products_menu values (menu_id, product_id)
-        //faci tu query-urile
-
-//        Local local = this.get(id);
-//        Menu menu = local.getMenu();
-//        menu.getProducts().add(product);
-//
+        productRepository.save(product);
+        Local local = this.get(id);
+        local.getMenu().getProducts().add(product);
+        //poate fi folosit pentru a updata variabila in baza de date
+        localRepository.save(local);
     }
 
 

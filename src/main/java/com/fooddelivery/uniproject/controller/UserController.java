@@ -43,7 +43,6 @@ public class UserController {
         return new ResponseEntity<>(new SuccessDto(), HttpStatus.OK);
     }
 
-    // VERIFICA DUPA CE FACI LOCAL SI ADD LOCAL
     @PostMapping("/order")
     @SneakyThrows
     public ResponseEntity<SuccessDto> makeOrder(@RequestBody OrderDto orderDto) {
