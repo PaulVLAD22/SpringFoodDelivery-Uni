@@ -23,10 +23,10 @@ public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @ManyToOne
-    private Order order;
 
-    @ManyToOne
+    // ASTA E O PROBLEMA , AR TREBUI SA REUSESC SA IAU PRODUCTS DIN produsele localului ales, pot face eu manual
+    // select from local where ...
+    @ManyToOne(cascade = CascadeType.ALL)
     private Product product;
 
     private long quantity;

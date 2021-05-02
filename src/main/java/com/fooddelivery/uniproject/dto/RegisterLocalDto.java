@@ -1,5 +1,6 @@
 package com.fooddelivery.uniproject.dto;
 
+import com.fooddelivery.uniproject.entity.local.Menu;
 import com.fooddelivery.uniproject.entity.location.Location;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +14,8 @@ import lombok.NoArgsConstructor;
 public class RegisterLocalDto {
 
     private String name;
+
+    private Menu menu;
 
     private Location location;
 }

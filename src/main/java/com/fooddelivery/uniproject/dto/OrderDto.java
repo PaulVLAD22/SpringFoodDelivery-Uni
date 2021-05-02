@@ -18,6 +18,5 @@ public class OrderDto {
 
     private long localId;
 
-//    {"persons":[{"name":"shail1","age":"2"},{"name":"shail2","age":"3"}]}
     private List<OrderItem> orderItems;
 }

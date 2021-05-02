@@ -20,9 +20,9 @@ public class Local {
     private long id;
 
     private String name;
-    @OneToOne(cascade = CascadeType.REMOVE)
+    @OneToOne(cascade = CascadeType.ALL)
     private Menu menu;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private Location location;
 
 }

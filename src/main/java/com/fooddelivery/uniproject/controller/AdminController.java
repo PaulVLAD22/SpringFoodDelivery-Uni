@@ -6,6 +6,8 @@ import com.fooddelivery.uniproject.dto.UserDto;
 import com.fooddelivery.uniproject.entity.account.Driver;
 import com.fooddelivery.uniproject.entity.account.User;
 import com.fooddelivery.uniproject.entity.local.Local;
+import com.fooddelivery.uniproject.entity.local.Product;
+import com.fooddelivery.uniproject.exception.NonExistentId;
 import com.fooddelivery.uniproject.service.DriverService;
 import com.fooddelivery.uniproject.service.LocalService;
 import com.fooddelivery.uniproject.service.UserService;
@@ -54,7 +56,7 @@ public class AdminController {
                     .coordinate(driver.getCoordinate()).build();
 
             return new ResponseEntity<DriverDto>(driverDto, HttpStatus.OK);
-        } catch (NoSuchElementException e) {
+        } catch (NonExistentId e) {
             return new ResponseEntity<DriverDto>(HttpStatus.NOT_FOUND);
         }
     }
@@ -84,7 +86,7 @@ public class AdminController {
                     .coordinate(user.getCoordinate()).build();
 
             return new ResponseEntity<UserDto>(userDto, HttpStatus.OK);
-        } catch (NoSuchElementException e) {
+        } catch (NonExistentId e) {
             return new ResponseEntity<UserDto>(HttpStatus.NOT_FOUND);
         }
     }
@@ -98,6 +100,20 @@ public class AdminController {
     @PostMapping("/local/register")
     @SneakyThrows
     public ResponseEntity<SuccessDto> registerLocal(@RequestBody RegisterLocalDto registerLocalDto) {
+//
+//        {"name":"local1",
+//                "location":{
+//            "address":{
+//                "country":"romania",
+//                        "city":"bucuresti",
+//                        "street":"strada"
+//            },
+//            "coordinate":{
+//                "x":30,
+//                        "y":40
+//            }
+//        },
+//            "menu":{}}
         localService.registerLocal(registerLocalDto);
 
         return new ResponseEntity<>(new SuccessDto(), HttpStatus.OK);
@@ -105,12 +121,13 @@ public class AdminController {
 
     @PostMapping("local/id={id}/addProduct")
     @SneakyThrows
-    public ResponseEntity<Local> getLocal(@PathVariable Long id) {
+    @ResponseBody
+    public ResponseEntity<Local> getLocal(@PathVariable Long id, @RequestBody Product product) {
         try {
-            Local local = localService.get(id);
-            return new ResponseEntity<Local>(local, HttpStatus.OK);
+            localService.addProduct(id,product);
+            return new ResponseEntity<Local>(HttpStatus.OK);
 
-        } catch (NoSuchElementException e) {
+        } catch (NonExistentId e) {
             return new ResponseEntity<Local>(HttpStatus.NOT_FOUND);
         }
     }

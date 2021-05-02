@@ -3,8 +3,10 @@ package com.fooddelivery.uniproject.service;
 import com.fooddelivery.uniproject.dto.DriverDto;
 import com.fooddelivery.uniproject.dto.RegisterAccountDto;
 import com.fooddelivery.uniproject.entity.account.Driver;
+import com.fooddelivery.uniproject.entity.audit.Action;
+import com.fooddelivery.uniproject.exception.NonExistentId;
 import com.fooddelivery.uniproject.exception.UsernameOrEmailAlreadyTaken;
-import com.fooddelivery.uniproject.repository.CoordinateRepository;
+import com.fooddelivery.uniproject.repository.ActionRepository;
 import com.fooddelivery.uniproject.repository.DriverRepository;
 
 import lombok.SneakyThrows;
@@ -18,16 +20,19 @@ import java.util.List;
 @Service
 public class DriverService {
 
-    private CoordinateRepository coordinateRepository;
     private DriverRepository driverRepository;
+    private ActionRepository actionRepository;
 
     @Autowired
-    public DriverService(DriverRepository driverRepository, CoordinateRepository coordinateRepository) {
+    public DriverService(DriverRepository driverRepository, ActionRepository actionRepository) {
+        this.actionRepository = actionRepository;
         this.driverRepository = driverRepository;
-        this.coordinateRepository= coordinateRepository;
     }
 
     public List<DriverDto> listAll() {
+
+        actionRepository.save(new Action("List all drivers"));
+
         List<Driver> drivers = driverRepository.findAll();
         List<DriverDto> driverDtos = new ArrayList<>();
 
@@ -46,11 +51,12 @@ public class DriverService {
 
     @SneakyThrows
     public void registerDriver(RegisterAccountDto registerAccountDto) {
+
+        actionRepository.save(new Action("Register driver"));
+
         if (driverRepository.findUserByEmail(registerAccountDto.getEmail()).isPresent()) {
             throw new UsernameOrEmailAlreadyTaken();
         }
-
-        coordinateRepository.save(registerAccountDto.getCoordinate());
 
         Driver driver = Driver.builder()
                 .email(registerAccountDto.getEmail())
@@ -63,13 +69,17 @@ public class DriverService {
 
     @SneakyThrows
     public void removeDriver(Long userId) {
+
+        actionRepository.save(new Action("Remove driver"));
+
         Driver driver = driverRepository.findById(userId).orElseThrow(() -> new AccountNotFoundException("Driver not found"));
 
         driverRepository.delete(driver);
     }
 
     public Driver get(Long id){
-        return driverRepository.findById(id).get();
+        actionRepository.save(new Action("Getting driver by id"));
+        return driverRepository.findById(id).orElseThrow(NonExistentId::new);
     }
 
 }

@@ -5,10 +5,12 @@ import com.fooddelivery.uniproject.dto.RegisterAccountDto;
 import com.fooddelivery.uniproject.dto.UserDto;
 import com.fooddelivery.uniproject.entity.account.Driver;
 import com.fooddelivery.uniproject.entity.account.User;
+import com.fooddelivery.uniproject.entity.audit.Action;
 import com.fooddelivery.uniproject.entity.local.Local;
 import com.fooddelivery.uniproject.entity.order.Order;
 import com.fooddelivery.uniproject.entity.order.OrderStatus;
 import com.fooddelivery.uniproject.exception.NoDriverInRangeException;
+import com.fooddelivery.uniproject.exception.NonExistentId;
 import com.fooddelivery.uniproject.exception.UserHasNoActiveOrders;
 import com.fooddelivery.uniproject.exception.UsernameOrEmailAlreadyTaken;
 import com.fooddelivery.uniproject.repository.*;
@@ -30,38 +32,44 @@ public class UserService {
     private DriverRepository driverRepository;
     private OrderRepository orderRepository;
     private LocalRepository localRepository;
+    private ActionRepository actionRepository;
 
     @Autowired
     public UserService(UserRepository userRepository, CoordinateRepository coordinateRepository, DriverRepository driverRepository,
-                       OrderRepository orderRepository,LocalRepository localRepository) {
+                       OrderRepository orderRepository, LocalRepository localRepository, ActionRepository actionRepository) {
         this.userRepository = userRepository;
         this.coordinateRepository = coordinateRepository;
         this.driverRepository = driverRepository;
         this.orderRepository = orderRepository;
         this.localRepository = localRepository;
+        this.actionRepository = actionRepository;
     }
 
     public List<UserDto> listAll() {
+
+        actionRepository.save(new Action("List all users"));
+
         List<User> users = userRepository.findAll();
         List<UserDto> userDtos = new ArrayList<>();
 
-        users.forEach(user->userDtos.add(
+        users.forEach(user -> userDtos.add(
                 UserDto.builder()
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .coordinate(user.getCoordinate())
-                .build())
+                        .username(user.getUsername())
+                        .email(user.getEmail())
+                        .coordinate(user.getCoordinate())
+                        .build())
         );
         return userDtos;
     }
 
     @SneakyThrows
     public void registerUser(RegisterAccountDto registerAccountDto) {
+
+        actionRepository.save(new Action("Register users"));
+
         if (userRepository.findUserByEmail(registerAccountDto.getEmail(), registerAccountDto.getUsername()).isPresent()) {
             throw new UsernameOrEmailAlreadyTaken();
         }
-
-        coordinateRepository.save(registerAccountDto.getCoordinate());
 
         User user = User.builder()
                 .email(registerAccountDto.getEmail())
@@ -74,13 +82,23 @@ public class UserService {
 
     @SneakyThrows
     public void removeUser(Long userId) {
+
+        actionRepository.save(new Action("Remove user"));
+
         User user = userRepository.findById(userId).orElseThrow(() -> new AccountNotFoundException("Driver not found"));
 
         userRepository.delete(user);
     }
 
     public void makeOrder(OrderDto orderDto) {
-        Local chosenLocal = localRepository.getOne(orderDto.getLocalId());
+
+        actionRepository.save(new Action("User made order"));
+
+        Optional<Local> optionalChosenLocal = localRepository.findById(orderDto.getLocalId());
+        if (optionalChosenLocal.isEmpty()) {
+            throw new NonExistentId();
+        }
+        Local chosenLocal = optionalChosenLocal.get();
         Driver driver = closestDriver(chosenLocal);
         Order order = Order.builder()
                 .driver(driver)
@@ -92,23 +110,27 @@ public class UserService {
 
         orderRepository.save(order);
 
-        driverRepository.setCurrentOrder(order,driver.getId());
+        driverRepository.setCurrentOrder(order, driver.getId());
 
     }
 
     @SneakyThrows
-    public void confirmOrder(Long userId){
+    public void confirmOrder(Long userId) {
+
+        actionRepository.save(new Action("User confirmed action"));
+
         Optional<Order> order = orderRepository.findActiveOrderByUserId(userRepository.getOne(userId));
-        if (order.isEmpty()){
+        if (order.isEmpty()) {
             throw new UserHasNoActiveOrders();
         }
 
         orderRepository.setOrderInactive(order.get().getId());
-        driverRepository.setCurrentOrder(null,order.get().getDriver().getId());
+        driverRepository.setCurrentOrder(null, order.get().getDriver().getId());
 
     }
 
     private Driver closestDriver(Local chosenLocal) throws NoDriverInRangeException {
+
         List<Driver> drivers = driverRepository.findAll();
         double minimumDistance = Double.POSITIVE_INFINITY;
         int driverIndex = -1;
@@ -128,7 +150,8 @@ public class UserService {
     }
 
     public User get(Long id) {
-        return userRepository.findById(id).get();
+        actionRepository.save(new Action("Getting user by id"));
+        return userRepository.findById(id).orElseThrow(NonExistentId::new);
     }
 
 

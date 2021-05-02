@@ -1,6 +1,7 @@
 package com.fooddelivery.uniproject.controller;
 
 import com.fooddelivery.uniproject.dto.RegisterAccountDto;
+import com.fooddelivery.uniproject.repository.ActionRepository;
 import com.fooddelivery.uniproject.service.DriverService;
 import com.fooddelivery.uniproject.utils.SuccessDto;
 import lombok.SneakyThrows;

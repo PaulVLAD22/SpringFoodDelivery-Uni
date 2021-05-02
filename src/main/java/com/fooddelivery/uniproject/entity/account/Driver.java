@@ -9,10 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -25,7 +22,7 @@ public class Driver extends Account {
     @OneToOne
     private Order currentOrder;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private Coordinate coordinate;
 
     private double salary = 0;

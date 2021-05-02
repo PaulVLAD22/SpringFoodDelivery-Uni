@@ -21,7 +21,7 @@ import javax.persistence.Table;
 @Table(name = "users")
 public class User extends Account {
 
-    @OneToOne(cascade = CascadeType.REMOVE)
+    @OneToOne(cascade = CascadeType.ALL)
     private Coordinate coordinate;
 
     public User(long id, String username, String email, String password,Coordinate coordinate) {
