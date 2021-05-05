@@ -8,7 +8,10 @@ import com.fooddelivery.uniproject.entity.account.User;
 import com.fooddelivery.uniproject.entity.local.Local;
 import com.fooddelivery.uniproject.entity.local.Product;
 import com.fooddelivery.uniproject.entity.order.Order;
+import com.fooddelivery.uniproject.exception.LocalNameAlreadyTakenException;
+import com.fooddelivery.uniproject.exception.NoUserWithThisUsername;
 import com.fooddelivery.uniproject.exception.NonExistentId;
+import com.fooddelivery.uniproject.exception.UsernameOrEmailAlreadyTaken;
 import com.fooddelivery.uniproject.service.DriverService;
 import com.fooddelivery.uniproject.service.LocalService;
 import com.fooddelivery.uniproject.service.OrderService;
@@ -62,7 +65,22 @@ public class AdminController {
 
             return new ResponseEntity<DriverDto>(driverDto, HttpStatus.OK);
         } catch (NonExistentId e) {
-            return new ResponseEntity<DriverDto>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<DriverDto>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PutMapping("/renameDriver")
+    public ResponseEntity renameDriver(@RequestParam String oldName, @RequestParam String newName){
+        try {
+            driverService.renameDriver(oldName, newName);
+            return new ResponseEntity(new SuccessDto(), HttpStatus.OK);
+        }catch (NoUserWithThisUsername e) {
+            return new ResponseEntity(
+                    "There is no driver with this username",
+                    HttpStatus.NO_CONTENT);
+        }
+        catch (UsernameOrEmailAlreadyTaken e){
+            return new ResponseEntity("Username taken",HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -92,7 +110,21 @@ public class AdminController {
 
             return new ResponseEntity<UserDto>(userDto, HttpStatus.OK);
         } catch (NonExistentId e) {
-            return new ResponseEntity<UserDto>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<UserDto>(HttpStatus.BAD_REQUEST);
+        }
+    }
+    @PutMapping("/renameUser")
+    public ResponseEntity renameUser(@RequestParam String oldName, @RequestParam String newName){
+        try {
+            userService.renameUser(oldName, newName);
+            return new ResponseEntity(new SuccessDto(), HttpStatus.OK);
+        }catch (NoUserWithThisUsername e) {
+            return new ResponseEntity(
+                    "There is no user with this username",
+                    HttpStatus.NO_CONTENT);
+        }
+        catch (UsernameOrEmailAlreadyTaken e){
+            return new ResponseEntity("Username taken",HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -119,9 +151,29 @@ public class AdminController {
 //            }
 //        },
 //            "menu":{}}
-        localService.registerLocal(registerLocalDto);
+        try {
+            localService.registerLocal(registerLocalDto);
+            return new ResponseEntity<>(new SuccessDto(), HttpStatus.OK);
+        }
+        catch(LocalNameAlreadyTakenException e){
+            return new ResponseEntity("Local name taken", HttpStatus.BAD_REQUEST);
+        }
+    }
 
-        return new ResponseEntity<>(new SuccessDto(), HttpStatus.OK);
+    @PutMapping("local/id={id}/rename")
+    @SneakyThrows
+    public ResponseEntity<Local> renameLocal (@PathVariable Long id, @RequestParam String name){
+        try {
+            //localhost:8080/admin/local/id=1?name="numenou"
+            localService.rename(id,name);
+            return new ResponseEntity<Local>(HttpStatus.OK);
+
+        } catch (NonExistentId e) {
+            return new ResponseEntity("No local with this id",HttpStatus.BAD_REQUEST);
+        }
+        catch (LocalNameAlreadyTakenException e){
+            return new ResponseEntity("Name already taken",HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PostMapping("local/id={id}/addProduct")
@@ -135,7 +187,7 @@ public class AdminController {
             return new ResponseEntity<Local>(HttpStatus.OK);
 
         } catch (NonExistentId e) {
-            return new ResponseEntity<Local>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<Local>(HttpStatus.BAD_REQUEST);
         }
     }
 

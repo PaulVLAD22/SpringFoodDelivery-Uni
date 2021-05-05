@@ -3,8 +3,11 @@ package com.fooddelivery.uniproject.controller;
 
 import com.fooddelivery.uniproject.dto.OrderDto;
 import com.fooddelivery.uniproject.dto.RegisterAccountDto;
+import com.fooddelivery.uniproject.dto.UserDto;
 import com.fooddelivery.uniproject.exception.NoDriverInRangeException;
+import com.fooddelivery.uniproject.exception.NoUserWithThisUsername;
 import com.fooddelivery.uniproject.exception.UserHasNoActiveOrders;
+import com.fooddelivery.uniproject.exception.UsernameOrEmailAlreadyTaken;
 import com.fooddelivery.uniproject.service.UserService;
 import com.fooddelivery.uniproject.utils.SuccessDto;
 import lombok.SneakyThrows;
@@ -47,6 +50,9 @@ public class UserController {
     @SneakyThrows
     public ResponseEntity<SuccessDto> makeOrder(@RequestBody OrderDto orderDto) {
         try {
+//            {"userId":1,
+//                    "localId":1,
+//                    "orderItems":[{"product":{"name":"nume","price":50},"quantity":3}]}
             userService.makeOrder(orderDto);
         }
         catch(NoDriverInRangeException e) {
@@ -58,7 +64,7 @@ public class UserController {
         return new ResponseEntity<>(new SuccessDto(), HttpStatus.OK);
     }
 
-    @PostMapping("/confirm")
+    @PutMapping("/confirm")
     @SneakyThrows
     public ResponseEntity<SuccessDto> confirmOrder(@RequestParam Long userId) {
         try {

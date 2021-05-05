@@ -25,7 +25,7 @@ public class Product {
 
     @JsonIgnore
     @ManyToMany(mappedBy = "products", fetch = FetchType.LAZY)
-    private Set<Menu> menu = new HashSet<>();
+    private List<Menu> menu = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {

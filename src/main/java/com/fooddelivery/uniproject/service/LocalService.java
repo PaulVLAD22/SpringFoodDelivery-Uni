@@ -64,6 +64,15 @@ public class LocalService {
         //poate fi folosit pentru a updata variabila in baza de date
         localRepository.save(local);
     }
+    public void rename (Long id, String name){
+        if (localRepository.findLocalByName(name).isPresent()) {
+            throw new LocalNameAlreadyTakenException();
+        }
+        actionRepository.save(new Action("Renamed local"));
+        Local local = this.get(id);
+        local.setName(name);
+        localRepository.save(local);
+    }
 
 
 }

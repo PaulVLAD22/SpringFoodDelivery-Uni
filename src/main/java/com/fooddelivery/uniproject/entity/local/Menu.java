@@ -31,7 +31,7 @@ public class Menu {
             inverseJoinColumns = {
                     @JoinColumn(name = "product_id", referencedColumnName = "id",
                             nullable = false, updatable = false)})
-    private Set<Product> products = new HashSet<>();
+    private List<Product> products = new ArrayList<>();
 
 }
 

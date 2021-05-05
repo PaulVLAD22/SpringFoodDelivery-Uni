@@ -4,6 +4,7 @@ import com.fooddelivery.uniproject.dto.DriverDto;
 import com.fooddelivery.uniproject.dto.RegisterAccountDto;
 import com.fooddelivery.uniproject.entity.account.Driver;
 import com.fooddelivery.uniproject.entity.audit.Action;
+import com.fooddelivery.uniproject.exception.NoUserWithThisUsername;
 import com.fooddelivery.uniproject.exception.NonExistentId;
 import com.fooddelivery.uniproject.exception.UsernameOrEmailAlreadyTaken;
 import com.fooddelivery.uniproject.repository.ActionRepository;
@@ -54,7 +55,7 @@ public class DriverService {
 
         actionRepository.save(new Action("Register driver"));
 
-        if (driverRepository.findUserByEmail(registerAccountDto.getEmail()).isPresent()) {
+        if (driverRepository.findUserByEmailOrUsername(registerAccountDto.getEmail(),registerAccountDto.getUsername()).isPresent()) {
             throw new UsernameOrEmailAlreadyTaken();
         }
 
@@ -80,6 +81,16 @@ public class DriverService {
     public Driver get(Long id){
         actionRepository.save(new Action("Getting driver by id"));
         return driverRepository.findById(id).orElseThrow(NonExistentId::new);
+    }
+    public void renameDriver(String oldName, String newName){
+        if (driverRepository.findUserByEmailOrUsername("",oldName).isEmpty()) {
+            throw new NoUserWithThisUsername();
+        }
+        if (driverRepository.findUserByEmailOrUsername("",newName).isPresent()) {
+            throw new UsernameOrEmailAlreadyTaken();
+        }
+        driverRepository.renameDriver(oldName,newName);
+
     }
 
 }

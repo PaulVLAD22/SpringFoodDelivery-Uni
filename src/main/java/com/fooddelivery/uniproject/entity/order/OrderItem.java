@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.Map;
+import java.util.Objects;
 
 @Data
 @Builder
@@ -31,6 +32,18 @@ public class OrderItem {
 
     private long quantity;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof OrderItem)) return false;
+        OrderItem orderItem = (OrderItem) o;
+        return quantity == orderItem.quantity && product.equals(orderItem.product);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(product, quantity);
+    }
 }
 
 

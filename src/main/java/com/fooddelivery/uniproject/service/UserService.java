@@ -8,11 +8,9 @@ import com.fooddelivery.uniproject.entity.account.User;
 import com.fooddelivery.uniproject.entity.audit.Action;
 import com.fooddelivery.uniproject.entity.local.Local;
 import com.fooddelivery.uniproject.entity.order.Order;
+import com.fooddelivery.uniproject.entity.order.OrderItem;
 import com.fooddelivery.uniproject.entity.order.OrderStatus;
-import com.fooddelivery.uniproject.exception.NoDriverInRangeException;
-import com.fooddelivery.uniproject.exception.NonExistentId;
-import com.fooddelivery.uniproject.exception.UserHasNoActiveOrders;
-import com.fooddelivery.uniproject.exception.UsernameOrEmailAlreadyTaken;
+import com.fooddelivery.uniproject.exception.*;
 import com.fooddelivery.uniproject.repository.*;
 import com.fooddelivery.uniproject.utils.Methods;
 import lombok.SneakyThrows;
@@ -33,16 +31,19 @@ public class UserService {
     private OrderRepository orderRepository;
     private LocalRepository localRepository;
     private ActionRepository actionRepository;
+    private OrderItemsRepository orderItemsRepository;
 
     @Autowired
     public UserService(UserRepository userRepository, CoordinateRepository coordinateRepository, DriverRepository driverRepository,
-                       OrderRepository orderRepository, LocalRepository localRepository, ActionRepository actionRepository) {
+                       OrderRepository orderRepository, LocalRepository localRepository,
+                       ActionRepository actionRepository, OrderItemsRepository orderItemsRepository) {
         this.userRepository = userRepository;
         this.coordinateRepository = coordinateRepository;
         this.driverRepository = driverRepository;
         this.orderRepository = orderRepository;
         this.localRepository = localRepository;
         this.actionRepository = actionRepository;
+        this.orderItemsRepository = orderItemsRepository;
     }
 
     public List<UserDto> listAll() {
@@ -67,7 +68,7 @@ public class UserService {
 
         actionRepository.save(new Action("Register users"));
 
-        if (userRepository.findUserByEmail(registerAccountDto.getEmail(), registerAccountDto.getUsername()).isPresent()) {
+        if (userRepository.findUserByEmailOrUsername(registerAccountDto.getEmail(), registerAccountDto.getUsername()).isPresent()) {
             throw new UsernameOrEmailAlreadyTaken();
         }
 
@@ -99,23 +100,32 @@ public class UserService {
             throw new NonExistentId();
         }
 
-        // menu = local.getMenu
-        // for orderItem in orderItems:
-        // select product from products where products.menu = :menu
-
-        // apoi cream order cu orderItems pe care o creeam pe parcurs folosind orderItem.quantity
-
-
-
         Local chosenLocal = optionalChosenLocal.get();
+
         Driver driver = closestDriver(chosenLocal);
+
+        List <OrderItem> orderItems = new ArrayList<>();
+
+        System.out.println(orderDto.getOrderItems().size());
+
+        System.out.println(chosenLocal.getMenu().getProducts().size());
+
+        for (OrderItem orderItem : orderDto.getOrderItems()){
+            if (chosenLocal.getMenu().getProducts().contains(orderItem.getProduct())){
+                orderItems.add(orderItem);
+            }
+        }
+
+        //bject references an unsaved transient instance - save the transient instance before f
+
         Order order = Order.builder()
                 .driver(driver)
-                .orderItems(orderDto.getOrderItems())
+                .orderItems(orderItems)
                 .user(this.get(orderDto.getUserId()))
                 .local(chosenLocal)
                 .status(OrderStatus.ACTIVE)
                 .build();
+
 
         orderRepository.save(order);
 
@@ -163,5 +173,16 @@ public class UserService {
         return userRepository.findById(id).orElseThrow(NonExistentId::new);
     }
 
+    public void renameUser(String oldName, String newName){
+        System.out.println(userRepository.findUserByEmailOrUsername("",oldName).get());
+        if (userRepository.findUserByEmailOrUsername("",oldName).isEmpty()) {
+            throw new NoUserWithThisUsername();
+        }
+        if (userRepository.findUserByEmailOrUsername("",newName).isPresent()) {
+            throw new UsernameOrEmailAlreadyTaken();
+        }
+        userRepository.renameUser(oldName,newName);
+
+    }
 
 }

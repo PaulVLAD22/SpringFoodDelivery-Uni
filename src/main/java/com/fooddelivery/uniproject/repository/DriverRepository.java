@@ -15,8 +15,15 @@ import java.util.Optional;
 
 @Repository
 public interface DriverRepository extends JpaRepository<Driver,Long> {
-    @Query("SELECT d FROM Driver d WHERE d.email = :email")
-    Optional<Driver> findUserByEmail(@Param("email") String email);
+    @Query("SELECT d FROM Driver d WHERE d.email = :email or d.username = :username")
+    Optional<Driver> findUserByEmailOrUsername(@Param("email") String email,@Param("user")String username);
+
+    //doesn't update value in db
+    @Transactional
+    @Modifying
+    @Query("update Driver set username = :newName where username = :oldName")
+    void renameDriver(@Param("newName")String newName,@Param("oldName")String oldName);
+
 
     @Transactional
     @Modifying
