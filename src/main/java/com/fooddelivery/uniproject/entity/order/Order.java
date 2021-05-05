@@ -34,6 +34,6 @@ public class Order {
     private Driver driver;
     @ManyToOne
     private Local local;
-    @OneToMany(cascade = CascadeType.REMOVE)
+    @OneToMany(cascade = CascadeType.ALL)
     private List<OrderItem> orderItems;
 }

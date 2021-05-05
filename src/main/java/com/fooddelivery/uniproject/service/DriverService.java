@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DriverService {
@@ -83,14 +84,20 @@ public class DriverService {
         return driverRepository.findById(id).orElseThrow(NonExistentId::new);
     }
     public void renameDriver(String oldName, String newName){
-        if (driverRepository.findUserByEmailOrUsername("",oldName).isEmpty()) {
+        Optional<Driver> driver = driverRepository.findUserByEmailOrUsername("",oldName);
+        if (driver.isEmpty()) {
             throw new NoUserWithThisUsername();
         }
         if (driverRepository.findUserByEmailOrUsername("",newName).isPresent()) {
             throw new UsernameOrEmailAlreadyTaken();
         }
-        driverRepository.renameDriver(oldName,newName);
+        driver.get().setUsername(newName);
+        driverRepository.save(driver.get());
 
+    }
+    public double getSalary(Long id){
+        Driver driver = this.get(id);
+        return driver.getSalary();
     }
 
 }

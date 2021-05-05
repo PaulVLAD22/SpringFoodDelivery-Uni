@@ -17,10 +17,4 @@ public interface UserRepository extends JpaRepository<User,Long> {
     @Query("SELECT u FROM User u WHERE u.email = :email or u.username = :username")
     Optional<User> findUserByEmailOrUsername(@Param("email") String email, @Param("username")String username);
 
-    //doesn't update value in db
-    @Transactional
-    @Modifying
-    @Query("update User set username = :newName where username = :oldName")
-    void renameUser(@Param("newName")String newName,@Param("oldName")String oldName);
-
 }

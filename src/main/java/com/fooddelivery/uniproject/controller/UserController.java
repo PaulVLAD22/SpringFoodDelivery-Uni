@@ -4,10 +4,7 @@ package com.fooddelivery.uniproject.controller;
 import com.fooddelivery.uniproject.dto.OrderDto;
 import com.fooddelivery.uniproject.dto.RegisterAccountDto;
 import com.fooddelivery.uniproject.dto.UserDto;
-import com.fooddelivery.uniproject.exception.NoDriverInRangeException;
-import com.fooddelivery.uniproject.exception.NoUserWithThisUsername;
-import com.fooddelivery.uniproject.exception.UserHasNoActiveOrders;
-import com.fooddelivery.uniproject.exception.UsernameOrEmailAlreadyTaken;
+import com.fooddelivery.uniproject.exception.*;
 import com.fooddelivery.uniproject.service.UserService;
 import com.fooddelivery.uniproject.utils.SuccessDto;
 import lombok.SneakyThrows;
@@ -59,7 +56,12 @@ public class UserController {
             //nu gasim sofer
             return new ResponseEntity(
                     "No driver in range",
-                    HttpStatus.NO_CONTENT);
+                    HttpStatus.OK);
+        }
+        catch (LocalHasNoSuchProduct e ){
+            return new ResponseEntity(
+                    "Local has no such product",
+                    HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(new SuccessDto(), HttpStatus.OK);
     }

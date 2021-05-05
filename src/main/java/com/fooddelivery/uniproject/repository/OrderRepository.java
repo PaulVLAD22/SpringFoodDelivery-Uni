@@ -14,7 +14,7 @@ import java.util.Optional;
 @Repository
 public interface OrderRepository extends JpaRepository<Order,Long> {
     @Query("SELECT o from Order o where o.status = 1 and o.user = :user")
-    Optional<Order> findActiveOrderByUserId(@Param("user") User user);
+    Optional<Order> findActiveOrderByUser(@Param("user") User user);
     @Transactional
     @Modifying
     @Query("Update Order o set o.status='0' where o.id = :orderId")

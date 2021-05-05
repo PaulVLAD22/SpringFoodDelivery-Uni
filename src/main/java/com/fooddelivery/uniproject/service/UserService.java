@@ -7,6 +7,7 @@ import com.fooddelivery.uniproject.entity.account.Driver;
 import com.fooddelivery.uniproject.entity.account.User;
 import com.fooddelivery.uniproject.entity.audit.Action;
 import com.fooddelivery.uniproject.entity.local.Local;
+import com.fooddelivery.uniproject.entity.local.Product;
 import com.fooddelivery.uniproject.entity.order.Order;
 import com.fooddelivery.uniproject.entity.order.OrderItem;
 import com.fooddelivery.uniproject.entity.order.OrderStatus;
@@ -18,9 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -32,11 +31,13 @@ public class UserService {
     private LocalRepository localRepository;
     private ActionRepository actionRepository;
     private OrderItemsRepository orderItemsRepository;
+    private ProductRepository productRepository;
 
     @Autowired
     public UserService(UserRepository userRepository, CoordinateRepository coordinateRepository, DriverRepository driverRepository,
                        OrderRepository orderRepository, LocalRepository localRepository,
-                       ActionRepository actionRepository, OrderItemsRepository orderItemsRepository) {
+                       ActionRepository actionRepository, OrderItemsRepository orderItemsRepository,
+                       ProductRepository productRepository) {
         this.userRepository = userRepository;
         this.coordinateRepository = coordinateRepository;
         this.driverRepository = driverRepository;
@@ -44,6 +45,7 @@ public class UserService {
         this.localRepository = localRepository;
         this.actionRepository = actionRepository;
         this.orderItemsRepository = orderItemsRepository;
+        this.productRepository = productRepository;
     }
 
     public List<UserDto> listAll() {
@@ -91,6 +93,7 @@ public class UserService {
         userRepository.delete(user);
     }
 
+    @SneakyThrows
     public void makeOrder(OrderDto orderDto) {
 
         actionRepository.save(new Action("User made order"));
@@ -99,24 +102,27 @@ public class UserService {
         if (optionalChosenLocal.isEmpty()) {
             throw new NonExistentId();
         }
-
         Local chosenLocal = optionalChosenLocal.get();
+        Map<Optional<Product>,Long> optionalProducts = new HashMap<>();
+        orderDto.getOrderItems().forEach(orderItem -> optionalProducts.put(productRepository.getProductByNamePrice(orderItem.getProduct().getName(),
+                orderItem.getProduct().getPrice()),orderItem.getQuantity()));
 
-        Driver driver = closestDriver(chosenLocal);
-
-        List <OrderItem> orderItems = new ArrayList<>();
-
-        System.out.println(orderDto.getOrderItems().size());
-
-        System.out.println(chosenLocal.getMenu().getProducts().size());
-
-        for (OrderItem orderItem : orderDto.getOrderItems()){
-            if (chosenLocal.getMenu().getProducts().contains(orderItem.getProduct())){
-                orderItems.add(orderItem);
+        for (Optional<Product> optionalProduct : optionalProducts.keySet()){
+            if (optionalProduct.isEmpty() || (! chosenLocal.getMenu().getProducts().contains(optionalProduct.get()))){
+                throw new LocalHasNoSuchProduct();
             }
         }
 
-        //bject references an unsaved transient instance - save the transient instance before f
+        Driver driver = closestDriver(chosenLocal);
+
+        List<OrderItem> orderItems = new ArrayList<>();
+
+        for (Optional<Product> optionalProduct : optionalProducts.keySet()){
+            orderItems.add(OrderItem.builder()
+                    .product(optionalProduct.get())
+                    .quantity(optionalProducts.get(optionalProduct))
+                    .build());
+        }
 
         Order order = Order.builder()
                 .driver(driver)
@@ -138,7 +144,7 @@ public class UserService {
 
         actionRepository.save(new Action("User confirmed action"));
 
-        Optional<Order> order = orderRepository.findActiveOrderByUserId(userRepository.getOne(userId));
+        Optional<Order> order = orderRepository.findActiveOrderByUser(userRepository.getOne(userId));
         if (order.isEmpty()) {
             throw new UserHasNoActiveOrders();
         }
@@ -174,14 +180,17 @@ public class UserService {
     }
 
     public void renameUser(String oldName, String newName){
-        System.out.println(userRepository.findUserByEmailOrUsername("",oldName).get());
-        if (userRepository.findUserByEmailOrUsername("",oldName).isEmpty()) {
+        //System.out.println(userRepository.findUserByEmailOrUsername("",oldName).get());
+        Optional<User> user = userRepository.findUserByEmailOrUsername("",oldName);
+        if (user.isEmpty()) {
             throw new NoUserWithThisUsername();
         }
         if (userRepository.findUserByEmailOrUsername("",newName).isPresent()) {
             throw new UsernameOrEmailAlreadyTaken();
         }
-        userRepository.renameUser(oldName,newName);
+        user.get().setUsername(newName);
+        userRepository.save(user.get());
+        //userRepository.renameUser(oldName,newName);
 
     }
 
