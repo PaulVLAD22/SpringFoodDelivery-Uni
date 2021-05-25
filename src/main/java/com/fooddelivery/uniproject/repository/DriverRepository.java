@@ -18,10 +18,9 @@ public interface DriverRepository extends JpaRepository<Driver,Long> {
     @Query("SELECT d FROM Driver d WHERE d.email = :email or d.username = :username")
     Optional<Driver> findUserByEmailOrUsername(@Param("email") String email,@Param("user")String username);
 
-    //doesn't update value in db
     @Transactional
     @Modifying
-    @Query("update Driver set username = :newName where username = :oldName")
+    @Query("update Driver d set d.username = :newName where d.username = :oldName")
     void renameDriver(@Param("newName")String newName,@Param("oldName")String oldName);
 
 

@@ -39,7 +39,7 @@ public class DriverController {
         return new ResponseEntity<>(new SuccessDto(), HttpStatus.OK);
     }
 
-    @PostMapping("/getSalary")
+    @GetMapping("/getSalary")
     @SneakyThrows
     public double getSalary(@RequestParam Long id){
         return driverService.getSalary(id);

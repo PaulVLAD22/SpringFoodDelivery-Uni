@@ -27,11 +27,6 @@ public class Driver extends Account {
 
     private double salary = 0;
 
-    public Driver(long id, String username, String email, Coordinate coordinate, String password) {
-        super(id, username, email, password);
-        this.coordinate=coordinate;
-    }
-
     @Override
     public String toString() {
         return "Driver id: " + this.getId() + " " + super.toString();
